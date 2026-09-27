@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>FoodCheck AI — Know Your Food</title>
+  <meta
+    name="description"
+    content="FoodCheck AI helps you understand your food with simple nutrition insights and health scores."
+  />
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #07110d;
+      --bg2: #0c1914;
+      --card: rgba(255, 255, 255, 0.06);
+      --border: rgba(255, 255, 255, 0.1);
+      --text: #f4f8f5;
+      --muted: #9aa9a1;
+      --green: #62e58b;
+      --green-dark: #1e9e51;
+      --yellow: #ffd95a;
+      --red: #ff6b6b;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: Inter, Arial, sans-serif;
+      background:
+        radial-gradient(circle at 10% 10%, rgba(98, 229, 139, 0.13), transparent 30%),
+        radial-gradient(circle at 90% 20%, rgba(255, 217, 90, 0.08), transparent 25%),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .container {
+      width: min(1120px, 92%);
+      margin: auto;
+    }
+
+    /* NAVBAR */
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      backdrop-filter: blur(18px);
+      background: rgba(7, 17, 13, 0.78);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .nav-inner {
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .logo-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--green), #b4f7c8);
+      color: #06200f;
+      box-shadow: 0 8px 30px rgba(98,229,139,.25);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .nav-links a:hover {
+      color: white;
+    }
+
+    .nav-button {
+      background: white;
+      color: #07110d;
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 14px;
+      transition: .25s;
+    }
+
+    .nav-button:hover {
+      transform: translateY(-2px);
+    }
+
+    /* HERO */
+
+    .hero {
+      padding: 95px 0 70px;
+      text-align: center;
+      position: relative;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border: 1px solid rgba(98,229,139,.25);
+      background: rgba(98,229,139,.07);
+      color: var(--green);
+      border-radius: 999px;
+      font-size: 13px;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      max-width: 850px;
+      margin: auto;
+      font-size: clamp(44px, 7vw, 82px);
+      line-height: .98;
+      letter-spacing: -4px;
+    }
+
+    .gradient-text {
+      background: linear-gradient(90deg, #ffffff, var(--green), #d5ffe1);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .hero p {
+      max-width: 650px;
+      margin: 25px auto;
+      color: var(--muted);
+      font-size: 18px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 30px;
+    }
+
+    .primary-btn,
+    .secondary-btn {
+      border: 0;
+      cursor: pointer;
+      border-radius: 14px;
+      padding: 14px 23px;
+      font-weight: 800;
+      transition: .25s;
+    }
+
+    .primary-btn {
+      background: var(--green);
+      color: #06150b;
+      box-shadow: 0 12px 35px rgba(98,229,139,.2);
+    }
+
+    .secondary-btn {
+      background: var(--card);
+      color: white;
+      border: 1px solid var(--border);
+    }
+
+    .primary-btn:hover,
+    .secondary-btn:hover {
+      transform: translateY(-3px);
+    }
+
+    /* ANALYZER */
+
+    .analyzer {
+      margin-top: 50px;
+      background: rgba(255,255,255,.055);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 28px;
+      text-align: left;
+      box-shadow: 0 30px 100px rgba(0,0,0,.3);
+    }
+
+    .analyzer-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .analyzer-top h2 {
+      font-size: 24px;
+    }
+
+    .analyzer-top span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .search-box {
+      display: flex;
+      gap: 10px;
+    }
+
+    .search-box input {
+      flex: 1;
+      min-width: 0;
+      background: rgba(0,0,0,.25);
+      border: 1px solid var(--border);
+      color: white;
+      padding: 15px 17px;
+      border-radius: 13px;
+      outline: none;
+    }
+
+    .search-box input:focus {
+      border-color: rgba(98,229,139,.6);
+    }
+
+    .search-box button {
+      border: 0;
+      background: var(--green);
+      color: #06150b;
+      padding: 0 22px;
+      border-radius: 13px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .result {
+      margin-top: 25px;
+      display: none;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 20px;
+    }
+
+    .result.show {
+      display: grid;
+    }
+
+    .score-card,
+    .nutrition-card {
+      background: rgba(0,0,0,.18);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 25px;
+    }
+
+    .score-card {
+      text-align: center;
+    }
+
+    .food-emoji {
+      font-size: 55px;
+      margin-bottom: 8px;
+    }
+
+    .score-circle {
+      width: 155px;
+      height: 155px;
+      margin: 20px auto;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at center, #09150e 58%, transparent 59%),
+        conic-gradient(var(--green) 0 72%, rgba(255,255,255,.08) 72% 100%);
+    }
+
+    .score-number {
+      font-size: 42px;
+      font-weight: 900;
+    }
+
+    .score-label {
+      color: var(--green);
+      font-weight: 800;
+    }
+
+    .nutrition-card h3 {
+      margin-bottom: 17px;
+    }
+
+    .nutrient {
+      margin-bottom: 17px;
+    }
+
+    .nutrient-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      margin-bottom: 7px;
+    }
+
+    .bar {
+      height: 8px;
+      background: rgba(255,255,255,.08);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .bar span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--green);
+    }
+
+    .alternative {
+      margin-top: 20px;
+      padding: 14px;
+      border-radius: 14px;
+      background: rgba(98,229,139,.08);
+      border: 1px solid rgba(98,229,139,.15);
+      font-size: 14px;
+    }
+
+    /* SECTIONS */
+
+    section {
+      padding: 90px 0;
+    }
+
+    .section-heading {
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto 45px;
+    }
+
+    .section-heading span {
+      color: var(--green);
+      font-weight: 800;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .section-heading h2 {
+      font-size: clamp(34px, 5vw, 55px);
+      line-height: 1.05;
+      margin: 12px 0;
+      letter-spacing: -2px;
+    }
+
+    .section-heading p {
+      color: var(--muted);
+    }
+
+    /* FEATURES */
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 17px;
+    }
+
+    .feature-card {
+      padding: 28px;
+      min-height: 210px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      border-radius: 22px;
+      transition: .3s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-7px);
+      border-color: rgba(98,229,139,.3);
+    }
+
+    .feature-icon {
+      font-size: 32px;
+      margin-bottom: 22px;
+    }
+
+    .feature-card h3 {
+      margin-bottom: 8px;
+    }
+
+    .feature-card p {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    /* HOW IT WORKS */
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .step {
+      position: relative;
+      padding: 30px;
+      border-radius: 22px;
+      background: linear-gradient(145deg, rgba(255,255,255,.06), rgba(255,255,255,.025));
+      border: 1px solid var(--border);
+    }
+
+    .step-number {
+      font-size: 13px;
+      color: var(--green);
+      font-weight: 900;
+    }
+
+    .step h3 {
+      margin: 15px 0 8px;
+    }
+
+    .step p {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    /* CTA */
+
+    .cta {
+      text-align: center;
+      border: 1px solid var(--border);
+      background:
+        radial-gradient(circle at center, rgba(98,229,139,.12), transparent 60%),
+        rgba(255,255,255,.035);
+      border-radius: 30px;
+      padding: 65px 25px;
+    }
+
+    .cta h2 {
+      font-size: clamp(35px, 5vw, 58px);
+      line-height: 1;
+      margin-bottom: 17px;
+    }
+
+    .cta p {
+      color: var(--muted);
+      max-width: 570px;
+      margin: 0 auto 25px;
+    }
+
+    /* FOOTER */
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 35px 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 18px;
+    }
+
+    /* MOBILE */
+
+    @media (max-width: 800px) {
+      .nav-links {
+        display: none;
+      }
+
+      .hero {
+        padding-top: 65px;
+      }
+
+      .hero h1 {
+        letter-spacing: -2px;
+      }
+
+      .analyzer-top {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .result {
+        grid-template-columns: 1fr;
+      }
+
+      .features,
+      .steps {
+        grid-template-columns: 1fr;
+      }
+
+      section {
+        padding: 65px 0;
+      }
+
+      .footer-inner {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .analyzer {
+        padding: 18px;
+      }
+
+      .search-box {
+        flex-direction: column;
+      }
+
+      .search-box button {
+        padding: 14px;
+      }
+
+      .hero p {
+        font-size: 16px;
+      }
+
+      .primary-btn,
+      .secondary-btn {
+        width: 100%;
+      }
+
+      .hero-buttons {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+  <nav>
+    <div class="container nav-inner">
+
+      <a href="#" class="logo">
+        <span class="logo-icon">🥗</span>
+        FoodCheck AI
+      </a>
+
+      <div class="nav-links">
+        <a href="#analyzer">Analyze</a>
+        <a href="#features">Features</a>
+        <a href="#how">How It Works</a>
+      </div>
+
+      <a href="#analyzer" class="nav-button">
+        Try Free
+      </a>
+
+    </div>
+  </nav>
+
+
+  <!-- HERO -->
+  <main>
+
+    <section class="hero">
+      <div class="container">
+
+        <div class="badge">
+          ✦ AI-powered food insights
+        </div>
+
+        <h1>
+          Know your food.<br>
+          <span class="gradient-text">Eat smarter.</span>
+        </h1>
+
+        <p>
+          Understand what you're eating with simple nutrition information,
+          food health scores and smarter alternatives.
+        </p>
+
+        <div class="hero-buttons">
+          <a href="#analyzer" class="primary-btn">
+            Analyze Food →
+          </a>
+
+          <a href="#how" class="secondary-btn">
+            How it works
+          </a>
+        </div>
+
+
+        <!-- ANALYZER -->
+        <div class="analyzer" id="analyzer">
+
+          <div class="analyzer-top">
+            <div>
+              <h2>🔎 Analyze a food</h2>
+              <span>Try our demo analyzer</span>
+            </div>
+          </div>
+
+          <div class="search-box">
+            <input
+              id="foodInput"
+              type="text"
+              placeholder="Example: Pizza, Burger, Apple..."
+            />
+
+            <button onclick="analyzeFood()">
+              Analyze
+            </button>
+          </div>
+
+
+          <!-- RESULT -->
+          <div class="result" id="result">
+
+            <div class="score-card">
+
+              <div class="food-emoji" id="foodEmoji">
+                🍕
+              </div>
+
+              <h2 id="foodName">
+                Pizza
+              </h2>
+
+              <div class="score-circle">
+                <div>
+                  <div class="score-number" id="score">
+                    72
+                  </div>
+                  <small>/ 100</small>
+                </div>
+              </div>
+
+              <div class="score-label" id="scoreLabel">
+                Moderately Healthy
+              </div>
+
+            </div>
+
+
+            <div class="nutrition-card">
+
+              <h3>Nutrition Overview</h3>
+
+              <div class="nutrient">
+                <div class="nutrient-row">
+                  <span>Calories</span>
+                  <b id="calories">285 kcal</b>
+                </div>
+
+                <div class="bar">
+                  <span id="calorieBar" style="width:65%"></span>
+                </div>
+              </div>
+
+
+              <div class="nutrient">
+                <div class="nutrient-row">
+                  <span>Protein</span>
+                  <b id="protein">12g</b>
+                </div>
+
+                <div class="bar">
+                  <span id="proteinBar" style="width:45%"></span>
+                </div>
+              </div>
+
+
+              <div class="nutrient">
+                <div class="nutrient-row">
+                  <span>Sugar</span>
+                  <b id="sugar">5g</b>
+                </div>
+
+                <div class="bar">
+                  <span id="sugarBar" style="width:25%"></span>
+                </div>
+              </div>
+
+
+              <div class="nutrient">
+                <div class="nutrient-row">
+                  <span>Fat</span>
+                  <b id="fat">10g</b>
+                </div>
+
+                <div class="bar">
+                  <span id="fatBar" style="width:42%"></span>
+                </div>
+              </div>
+
+
+              <div class="alternative" id="alternative">
+                💡 Healthier idea:
+                Choose a whole-wheat base and add more vegetables.
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- FEATURES -->
+    <section id="features">
+
+      <div class="container">
+
+        <div class="section-heading">
+          <span>Features</span>
+          <h2>Your food, explained simply.</h2>
+          <p>
+            FoodCheck turns nutrition information into something
+            easy to understand.
+          </p>
+        </div>
+
+
+        <div class="features">
+
+          <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3>Food Health Score</h3>
+            <p>
+              Get a simple score that summarizes important nutrition factors.
+            </p>
+          </div>
+
+
+          <div class="feature-card">
+            <div class="feature-icon">🥗</div>
+            <h3>Nutrition Breakdown</h3>
+            <p>
+              Understand calories, protein, sugar, carbohydrates and fats.
+            </p>
+          </div>
+
+
+          <div class="feature-card">
+            <div class="feature-icon">🤖</div>
+            <h3>AI Food Analysis</h3>
+            <p>
+              Future versions can use AI to identify foods from photos.
+            </p>
+          </div>
+
+
+          <div class="feature-card">
+            <div class="feature-icon">🏷️</div>
+            <h3>Label Scanner</h3>
+            <p>
+              Scan packaged-food nutrition labels and ingredients.
+            </p>
+          </div>
+
+
+          <div class="feature-card">
+            <div class="feature-icon">💡</div>
+            <h3>Smarter Alternatives</h3>
+            <p>
+              Discover simple alternatives with better nutritional profiles.
+            </p>
+          </div>
+
+
+          <div class="feature-card">
+            <div class="feature-icon">📱</div>
+            <h3>Coming to Mobile</h3>
+            <p>
+              A dedicated FoodCheck mobile app can bring these tools anywhere.
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- HOW IT WORKS -->
+    <section id="how">
+
+      <div class="container">
+
+        <div class="section-heading">
+          <span>How it works</span>
+          <h2>Three simple steps.</h2>
+          <p>
+            No complicated nutrition knowledge required.
+          </p>
+        </div>
+
+
+        <div class="steps">
+
+          <div class="step">
+            <div class="step-number">01 — SEARCH</div>
+            <h3>Choose your food</h3>
+            <p>
+              Search for a food or, in the future, upload a photo of it.
+            </p>
+          </div>
+
+
+          <div class="step">
+            <div class="step-number">02 — ANALYZE</div>
+            <h3>Get nutrition insights</h3>
+            <p>
+              FoodCheck processes available nutrition information.
+            </p>
+          </div>
+
+
+          <div class="step">
+            <div class="step-number">03 — UNDERSTAND</div>
+            <h3>Make informed choices</h3>
+            <p>
+              See the score, nutrition details and possible alternatives.
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- CTA -->
+    <section>
+
+      <div class="container">
+
+        <div class="cta">
+
+          <h2>
+            Food shouldn't<br>
+            be confusing.
+          </h2>
+
+          <p>
+            FoodCheck is being built to make everyday nutrition
+            information easier to understand.
+          </p>
+
+          <a href="#analyzer" class="primary-btn">
+            Try FoodCheck →
+          </a>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- FOOTER -->
+  <footer>
+
+    <div class="container footer-inner">
+
+      <div>
+        © 2026 FoodCheck AI. All rights reserved.
+      </div>
+
+      <div class="footer-links">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="mailto:hello@foodcheck.ai">Contact</a>
+      </div>
+
+    </div>
+
+  </footer>
+
+
+  <!-- JAVASCRIPT -->
+  <script>
+
+    const foods = {
+
+      pizza: {
+        name: "Pizza",
+        emoji: "🍕",
+        score: 72,
+        label: "Moderately Healthy",
+        calories: "285 kcal",
+        protein: "12g",
+        sugar: "5g",
+        fat: "10g",
+        calorieBar: "65%",
+        proteinBar: "45%",
+        sugarBar: "25%",
+        fatBar: "42%",
+        alternative:
+          "💡 Healthier idea: Choose a whole-wheat base and add more vegetables."
+      },
+
+      burger: {
+        name: "Burger",
+        emoji: "🍔",
+        score: 58,
+        label: "Occasional Food",
+        calories: "520 kcal",
+        protein: "24g",
+        sugar: "8g",
+        fat: "31g",
+        calorieBar: "82%",
+        proteinBar: "70%",
+        sugarBar: "35%",
+        fatBar: "75%",
+        alternative:
+          "💡 Healthier idea: Try a grilled burger with vegetables and a lighter sauce."
+      },
+
+      apple: {
+        name: "Apple",
+        emoji: "🍎",
+        score: 94,
+        label: "Highly Nutritious",
+        calories: "95 kcal",
+        protein: "0.5g",
+        sugar: "19g",
+        fat: "0.3g",
+        calorieBar: "20%",
+        proteinBar: "8%",
+        sugarBar: "55%",
+        fatBar: "5%",
+        alternative:
+          "💡 Great choice: Pair it with yogurt or nuts for a more filling snack."
+      },
+
+      banana: {
+        name: "Banana",
+        emoji: "🍌",
+        score: 91,
+        label: "Highly Nutritious",
+        calories: "105 kcal",
+        protein: "1.3g",
+        sugar: "14g",
+        fat: "0.4g",
+        calorieBar: "25%",
+        proteinBar: "12%",
+        sugarBar: "45%",
+        fatBar: "6%",
+        alternative:
+          "💡 Great choice: Pair with yogurt or nuts if you want extra protein and satiety."
+      },
+
+      salad: {
+        name: "Salad",
+        emoji: "🥗",
+        score: 96,
+        label: "Highly Nutritious",
+        calories: "120 kcal",
+        protein: "5g",
+        sugar: "6g",
+        fat: "4g",
+        calorieBar: "25%",
+        proteinBar: "28%",
+        sugarBar: "20%",
+        fatBar: "15%",
+        alternative:
+          "💡 Great choice: Add beans, eggs or another protein source for a balanced meal."
+      },
+
+      fries: {
+        name: "French Fries",
+        emoji: "🍟",
+        score: 42,
+        label: "Occasional Food",
+        calories: "312 kcal",
+        protein: "3.4g",
+        sugar: "0.3g",
+        fat: "15g",
+        calorieBar: "70%",
+        proteinBar: "12%",
+        sugarBar: "3%",
+        fatBar: "58%",
+        alternative:
+          "💡 Healthier idea: Try baked potato wedges with less added oil."
+      },
+
+      rice: {
+        name: "Rice",
+        emoji: "🍚",
+        score: 78,
+        label: "Generally Nutritious",
+        calories: "205 kcal",
+        protein: "4.3g",
+        sugar: "0.1g",
+        fat: "0.4g",
+        calorieBar: "48%",
+        proteinBar: "25%",
+        sugarBar: "2%",
+        fatBar: "6%",
+        alternative:
+          "💡 Tip: Pair rice with vegetables and a protein source for a balanced meal."
+      },
+
+      chicken: {
+        name: "Chicken",
+        emoji: "🍗",
+        score: 88,
+        label: "Protein Rich",
+        calories: "239 kcal",
+        protein: "27g",
+        sugar: "0g",
+        fat: "14g",
+        calorieBar: "55%",
+        proteinBar: "85%",
+        sugarBar: "0%",
+        fatBar: "45%",
+        alternative:
+          "💡 Tip: Grilled or roasted chicken can be a protein-rich option."
+      }
+
+    };
+
+
+    function analyzeFood() {
+
+      const input =
+        document.getElementById("foodInput")
+          .value
+          .trim()
+          .toLowerCase();
+
+      const result = document.getElementById("result");
+
+      if (!input) {
+        alert("Please enter a food name.");
+        return;
+      }
+
+      let food = null;
+
+      for (const key in foods) {
+        if (input.includes(key)) {
+          food = foods[key];
+          break;
+        }
+      }
+
+      if (!food) {
+
+        food = {
+          name: input.charAt(0).toUpperCase() + input.slice(1),
+          emoji: "🍽️",
+          score: 70,
+          label: "Demo Result",
+          calories: "—",
+          protein: "—",
+          sugar: "—",
+          fat: "—",
+          calorieBar: "50%",
+          proteinBar: "50%",
+          sugarBar: "30%",
+          fatBar: "40%",
+          alternative:
+            "💡 This is a demo result. A future AI/database connection can provide detailed nutrition information."
+        };
+
+      }
+
+      document.getElementById("foodName").textContent = food.name;
+      document.getElementById("foodEmoji").textContent = food.emoji;
+      document.getElementById("score").textContent = food.score;
+      document.getElementById("scoreLabel").textContent = food.label;
+
+      document.getElementById("calories").textContent = food.calories;
+      document.getElementById("protein").textContent = food.protein;
+      document.getElementById("sugar").textContent = food.sugar;
+      document.getElementById("fat").textContent = food.fat;
+
+      document.getElementById("calorieBar").style.width =
+        food.calorieBar;
+
+      document.getElementById("proteinBar").style.width =
+        food.proteinBar;
+
+      document.getElementById("sugarBar").style.width =
+        food.sugarBar;
+
+      document.getElementById("fatBar").style.width =
+        food.fatBar;
+
+      document.getElementById("alternative").textContent =
+        food.alternative;
+
+      result.classList.add("show");
+
+      result.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+
+    }
+
+
+    document
+      .getElementById("foodInput")
+      .addEventListener("keydown", function(event) {
+
+        if (event.key === "Enter") {
+          analyzeFood();
+        }
+
+      });
+
+  </script>
+
+</body>
+</html>
